@@ -192,7 +192,9 @@ module.exports = class PastaOrder extends Order {
         if (this.sDrinks.toLowerCase() !== "no") {
           aReturn.push(`plus ${this.sDrinks}`);
         }
-        aReturn.push(`Please pay for your order here`);
+        aReturn.push(
+          `Total is $${this.nOrder}. Please pay for your order here`
+        );
         aReturn.push(`${this.sUrl}/payment/${this.sNumber}/`);
         break;
       case OrderState.PAYMENT:
@@ -239,9 +241,11 @@ module.exports = class PastaOrder extends Order {
         <script
           src="https://www.paypal.com/sdk/js?client-id=${sClientID}"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
         </script>
-        Thank you ${this.sNumber} for your ${this.sItem} order of $${this.nOrder}.
+        Thank you ${this.sNumber} for your ${this.sItem} order of $${
+      this.nOrder
+    }.
         <div id="paypal-button-container"></div>
-  
+        <script src="/js/store.js" type="module"></script>
         <script>
           paypal.Buttons({
               createOrder: function(data, actions) {
@@ -259,8 +263,8 @@ module.exports = class PastaOrder extends Order {
                 return actions.order.capture().then(function(details) {
                   // This function shows a transaction success message to your buyer.
                   $.post(".", details, ()=>{
-                    window.open("", "_self");
-                    window.close(); 
+                    details.item=${JSON.stringify(this)};
+                    window.StoreData(details);
                   });
                 });
               }
